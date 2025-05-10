@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About Us{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row align-items-center">
+        <div class="col-md-6">
+            <img src="{% static 'assets/img/them.png' %}" class="img-fluid rounded shadow" alt="About Us Image">
+        </div>
+        <div class="col-md-6">
+            <h2 class="mb-4">Who We Are</h2>
+            <p class="text-muted">
+                Welcome to <strong>BestuMart</strong> — your one-stop destination for quality products at unbeatable prices. 
+                Founded in 2025, we are passionate about delivering excellent service, trusted products, and seamless shopping experiences.
+            </p>
+            <p class="text-muted">
+                We believe that shopping should be simple, enjoyable, and reliable. With a growing catalog of products across various categories, 
+                our mission is to bring top-tier items right to your doorstep.
+            </p>
+            <ul class="list-unstyled mt-3">
+                <li><i class="bi bi-check-circle-fill text-success"></i> 100% Quality Guarantee</li>
+                <li><i class="bi bi-check-circle-fill text-success"></i> Fast & Secure Delivery</li>
+                <li><i class="bi bi-check-circle-fill text-success"></i> Easy Return Policy</li>
+                <li><i class="bi bi-check-circle-fill text-success"></i> 24/7 Customer Support</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="mt-5">
+        <h3>Our Vision</h3>
+        <p class="text-muted">
+            To become the most trusted and loved e-commerce platform in Bangladesh, empowering people to shop smartly and live better.
+        </p>
+
+        <h3>Contact Us</h3>
+        <p class="text-muted">
+            Have questions? We’re always here to help.<br>
+            Email: <a href="mailto:support@bestumart.com">layebhossain849@gmail.com</a><br>
+            Phone: +880 1746325746
+        </p>
+    </div>
+</div>
+{% endblock %}

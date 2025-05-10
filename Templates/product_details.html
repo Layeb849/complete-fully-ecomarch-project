@@ -1,0 +1,37 @@
+
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Product Details{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3 class="mb-0">{{ product.title }}</h3>
+                </div>
+                <div class="card-body text-center">
+                    <img src="{{ product.product_image.url }}" class="img-fluid rounded mb-4" style="height: 300px; width: auto; object-fit: cover;" alt="{{ product.title }}">
+                    <p><strong>Description:</strong> {{ product.description }}</p>
+                    <p><strong>Composition:</strong> {{ product.composition }}</p>
+                    <p class="fs-5"><strong>Price:</strong> <span class="text-success">{{ product.selling_price }} ৳</span></p>
+                    <p class="fs-5"><strong>Discount:</strong> {{ product.diccount_price }} ৳</p>
+
+                    <!-- Add to Cart Button -->
+                    <form method="POST" action="">
+                        {% csrf_token %}
+                        <a href="{% url 'curt' %}" type="submit" class="btn btn-success mt-3 px-4">🛒 Add to Cart</a>
+                    </form>
+                </div>
+                <div class="card-footer text-center">
+                    <a href="{% url 'home' %}" class="btn btn-outline-primary">Back to Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
