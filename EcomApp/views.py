@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
-from .models import  product
+from .models import  Product
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
@@ -10,34 +10,34 @@ from django.contrib.auth.decorators import login_required
 
 
 def home(request):
-    products = product.objects.all() 
+    products = Product.objects.all() 
     return render(request, 'home.html',{'products': products})
 
 def AboutUs(request):
     return render(request, 'about.html')
 
-def AddToCurt(request):
-    return render(request, 'cart.html')
+# def AddToCurt(request):
+#     return render(request, 'cart.html')
 
 def ContactUs(request):
     return render(request, 'contact.html')
 
 class CategoryView(View):
     def get(self, request, valu):
-        products = product.objects.filter(category=valu)
+        products = Product.objects.filter(category=valu)
         return render(request, 'category.html', {'products': products})
 
 
 class CategoryTitle(View):
     def get(self, request, valu):
-        products = product.objects.filter(title=valu)
-        title = product.objects.filter(category=product[0].category).values('title')
+        products = Product.objects.filter(title=valu)
+        title = Product.objects.filter(category=Product[0].category).values('title')
         return render(request, 'category.html', {'products': products})
 
 
 class ProductDetails(View):
     def get(self, request, pk):
-        single_product = product.objects.get(pk=pk)
+        single_product = Product.objects.get(pk=pk)
         return render(request, 'product_details.html', {'product': single_product})
 
 #authentication
@@ -72,14 +72,171 @@ def profile_view(request):
     return render(request, 'profile.html')
 
 
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from .models import Product, Cart
+
+@login_required
+def add_to_cart(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+
+    cart_item, created = Cart.objects.get_or_create(
+        user=request.user,
+        product=product,
+        defaults={'quantity': 1}
+    )
+
+    if not created:
+        cart_item.quantity += 1
+        cart_item.save()
+
+    return redirect('cart')  # নিশ্চিত হও যে 'cart' URL ঠিক আছে
+
+
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from .models import Cart
+
+@login_required
+def cart_view(request):
+    cart_items = Cart.objects.filter(user=request.user)
+    total_amount = sum(item.total_cost for item in cart_items)
+    return render(request, 'cart.html', {'cart_items': cart_items, 'total_amount': total_amount})
+
+
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect, get_object_or_404
+from .models import Cart, Product
+
+@login_required
+def decrease_cart_quantity(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    cart_item = Cart.objects.filter(user=request.user, product=product).first()
+    
+    if cart_item:
+        if cart_item.quantity > 1:
+            cart_item.quantity -= 1
+            cart_item.save()
+        else:
+            cart_item.delete()
+    
+    return redirect('cart')  # cart view এর নাম
+
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect, get_object_or_404
+from .models import Cart, Product
+
+@login_required
+def remove_from_cart(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    cart_item = Cart.objects.filter(user=request.user, product=product).first()
+
+    if cart_item:
+        cart_item.delete()
+    
+    return redirect('cart')
+
+
+
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from .models import Cart
+
+@login_required
+def checkout_view(request):
+    cart_items = Cart.objects.filter(user=request.user)
+    total_amount = sum(item.total_cost for item in cart_items)
+
+    context = {
+        'cart_items': cart_items,
+        'total_amount': total_amount
+    }
+
+    return render(request, 'checkout.html', context)
 
 
 
 
 
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.utils import timezone
+from .models import Cart, Order, OrderItem, Product
+
+@login_required
+def checkout_views(request):
+    cart_items = Cart.objects.filter(user=request.user)
+    total_amount = sum(item.total_cost for item in cart_items)
+
+    if request.method == 'POST':
+        full_name = request.POST.get('full_name')
+        address = request.POST.get('address')
+        city = request.POST.get('city')
+        postal_code = request.POST.get('postal_code')
+        phone = request.POST.get('phone')
+
+        if not cart_items.exists():
+            return redirect('cart')
+
+        order = Order.objects.create(
+            user=request.user,
+            full_name=full_name,
+            address=address,
+            city=city,
+            postal_code=postal_code,
+            phone=phone,
+            created_at=timezone.now()
+        )
+
+        for item in cart_items:
+            OrderItem.objects.create(
+                order=order,
+                product=item.product,
+                quantity=item.quantity,
+                price=item.product.discount_price
+            )
+
+        cart_items.delete()
+        return redirect('order_success')
+
+    return render(request, 'checkouts.html', {
+        'cart_items': cart_items,
+        'total_amount': total_amount
+    })
+
+@login_required
+def order_success_view(request):
+    return render(request, 'order_success.html')
 
 
 
+#wishlist
+
+# views.py
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from .models import Wishlist, Product
+
+@login_required
+def add_to_wishlist(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    Wishlist.objects.get_or_create(user=request.user, product=product)
+    return redirect('wishlist')
+
+@login_required
+def remove_from_wishlist(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    Wishlist.objects.filter(user=request.user, product=product).delete()
+    return redirect('wishlist')
+
+@login_required
+def wishlist_view(request):
+    wishlist_items = Wishlist.objects.filter(user=request.user)
+    return render(request, 'wishlist.html', {'wishlist_items': wishlist_items})
 
 
 

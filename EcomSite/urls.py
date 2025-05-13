@@ -2,9 +2,10 @@
 
 
 
+from django import views
 from django.urls import path
 from django.contrib import admin
-from EcomApp.views import AboutUs, AddToCurt, CategoryView, ContactUs, CustomLogoutView, ProductDetails, RegisterView, home, profile_view
+from EcomApp.views import AboutUs, CategoryView, ContactUs, CustomLogoutView, ProductDetails, RegisterView, add_to_cart, add_to_wishlist, cart_view, checkout_view, checkout_views, decrease_cart_quantity, home, order_success_view, profile_view, remove_from_cart, remove_from_wishlist, wishlist_view
 from EcomSite import settings
 from django.conf.urls.static import static
 from django.contrib.auth.views import LogoutView
@@ -14,11 +15,24 @@ urlpatterns = [
     path("home/", home, name="home"),
     path("about/", AboutUs, name="about"),
     path("contact/", ContactUs, name="contact"),
-    path("curt/", AddToCurt, name="curt"),
     path('admin/', admin.site.urls),
     path("category/<str:valu>/", CategoryView.as_view(), name="category"),
     path("productdetails/<int:pk>/", ProductDetails.as_view(), name="productdetails"),
     path('profile/', profile_view, name='profile'),
+    
+    path("cart/", cart_view, name="cart"),
+    path('add-to-cart/<int:product_id>/', add_to_cart, name='add_to_cart'),
+    path('decrease-cart/<int:product_id>/', decrease_cart_quantity, name='decrease_cart'),
+    path('remove-from-cart/<int:product_id>/', remove_from_cart, name='remove_from_cart'),
+    path('checkout/', checkout_view, name='checkout'),
+    path('checkouts/', checkout_views, name='checkouts'),
+    path('order-success/', order_success_view, name='order_success'),
+
+     #wishlist
+    path('wishlist/', wishlist_view, name='wishlist'),
+    path('wishlist/add/<int:product_id>/', add_to_wishlist, name='add_to_wishlist'),
+    path('wishlist/remove/<int:product_id>/', remove_from_wishlist, name='remove_from_wishlist'),
+
 
     #athentication
     path('register/', RegisterView.as_view(), name='register'),

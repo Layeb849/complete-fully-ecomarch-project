@@ -24,4 +24,14 @@ class RegisterForm(forms.ModelForm):
 
 
 
+# from django import forms
+
+# class CheckoutForm(forms.Form):
+#     full_name = forms.CharField(max_length=100)
+#     address = forms.CharField(widget=forms.Textarea)
+#     city = forms.CharField(max_length=100)
+#     postal_code = forms.CharField(max_length=20)
+#     phone = forms.CharField(max_length=20)
+
+
 
